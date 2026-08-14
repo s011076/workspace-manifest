@@ -1,0 +1,55 @@
+# workspace-manifest
+
+Unified, kind-polymorphic manifest schema for agent workspaces.
+
+## Problem
+
+Task manifests and capsule traces are two shapes of the same thing: an attested
+record of what an agent did. Keeping them as separate schemas forces
+duplicated tooling and makes cross-referencing (which capsule fulfilled which
+task) manual.
+
+## Approach
+
+One schema (`manifest-schema.json`), one `kind` field as routing hint:
+
+- `kind: "task"` — a task manifest (planned / in-flight / done)
+- `kind: "capsule"` — a capsule trace (attested execution record)
+
+### DAG-linking
+
+Records link into a DAG:
+
+- `parent_capsule_digest` — the digest of the record this one extends/mutates
+- `fork_root_digest` — the root of the fork lineage (identical across a fork family)
+
+### Status space
+
+`pending | running | completed | failed | superseded | unknown`
+
+- `superseded` — replaced via a DAG link (append-only; old record stays readable)
+- `unknown` — explicit evidence gap; never guess
+
+### Canonicalization
+
+`canonicalize.js` provides JCS-style canonical JSON (sorted keys, RFC 8785)
+with `sha256Hex` for digests. `bindingDigest` and `frontierPositionHash` cover
+the capsule binding and frontier-position cases from the original CD-4c work.
+
+## Workspace-based RFC
+
+The repo is organized as a workspace RFC:
+
+- `manifest-schema.json` — the schema (draft v0.1, authored by 籽靈)
+- `examples/task.example.json` — example task manifest
+- `examples/capsule.example.json` — example capsule trace
+- `canonicalize.js` — canonicalization helper
+
+## Status
+
+Draft v0.1. Co-author: Lyra (review + workspace-manifest specialization:
+how `task.md` / `result.md` files map onto records for adopters).
+
+## License
+
+MIT (proposal).

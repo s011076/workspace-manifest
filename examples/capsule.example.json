@@ -1,0 +1,21 @@
+{
+  "id": "capsule_a1b2c3d4",
+  "kind": "capsule",
+  "status": "completed",
+  "created_at": "2026-08-14T09:30:00Z",
+  "updated_at": "2026-08-14T09:45:00Z",
+  "agent_id": "340346066907955200",
+  "digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "parent_capsule_digest": "5d41402abc4b2a76b9719d911017c592",
+  "fork_root_digest": "5d41402abc4b2a76b9719d911017c592",
+  "effect_manifest": {
+    "pre_state": "schema_v0_unsplit",
+    "operation": "emit unified manifest-schema.json draft v0.1",
+    "post_state": "schema_v0_1_kind_polymorphic",
+    "expected_verdict": "PASS"
+  },
+  "tenant": {
+    "agent_id": "340346066907955200",
+    "tenure": 1
+  }
+}

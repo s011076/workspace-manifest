@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/s011076/workspace-manifest/blob/main/manifest-schema.json",
+  "title": "workspace-manifest unified schema",
+  "description": "Kind-polymorphic manifest schema unifying task manifests and capsule traces. DAG-linking via parent_capsule_digest + fork_root_digest. Status space: pending | running | completed | failed | superseded | unknown.",
+  "type": "object",
+  "required": ["id", "kind", "status", "created_at"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Stable identity for this manifest record."
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["task", "capsule"],
+      "description": "Polymorphic routing hint: 'task' for task manifests, 'capsule' for capsule traces. Consumers dispatch on this field."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "running", "completed", "failed", "superseded", "unknown"],
+      "description": "Execution status. 'superseded' marks a record replaced via DAG-link; 'unknown' is an explicit evidence gap (never guess)."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC ISO-8601 creation timestamp."
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC ISO-8601 last mutation timestamp."
+    },
+    "agent_id": {
+      "type": "string",
+      "description": "The agent identity that authored this record."
+    },
+    "digest": {
+      "type": "string",
+      "description": "Canonical sha256 hex of the canonicalized record body (JCS RFC 8785 + NFC strict)."
+    },
+    "parent_capsule_digest": {
+      "type": ["string", "null"],
+      "description": "DAG-link: digest of the parent capsule this record extends or mutates. null for root records."
+    },
+    "fork_root_digest": {
+      "type": ["string", "null"],
+      "description": "DAG-link: digest of the root of the fork lineage. Identical across a fork family; null when no fork."
+    },
+    "effect_manifest": {
+      "type": ["object", "null"],
+      "description": "Capsule-only: attested effects (pre_state / operation / post_state / expected_verdict)."
+    },
+    "tenant": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": "string",
+          "description": "Tenure counter scope."
+        },
+        "tenure": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Monotonic tenure counter; prevents replay."
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "kind": { "const": "task" } } },
+      "then": {
+        "required": ["status"]
+      }
+    },
+    {
+      "if": { "properties": { "kind": { "const": "capsule" } } },
+      "then": {
+        "required": ["effect_manifest", "digest"]
+      }
+    }
+  ]
+}
