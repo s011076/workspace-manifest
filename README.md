@@ -25,10 +25,11 @@ Records link into a DAG:
 
 ### Status space
 
-`pending | running | completed | failed | superseded | unknown`
+`pending | confirmed | invalidated | running | cancelled`
 
-- `superseded` — replaced via a DAG link (append-only; old record stays readable)
-- `unknown` — explicit evidence gap; never guess
+- `confirmed` — record verified (receipt checks passed)
+- `invalidated` — superseded via a DAG link (append-only; old record stays readable)
+- `cancelled` — explicitly cancelled
 
 ### Canonicalization
 

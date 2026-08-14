@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/s011076/workspace-manifest/blob/main/manifest-schema.json",
   "title": "workspace-manifest unified schema",
-  "description": "Kind-polymorphic manifest schema unifying task manifests and capsule traces. DAG-linking via parent_capsule_digest + fork_root_digest. Status space: pending | running | completed | failed | superseded | unknown.",
+  "description": "Kind-polymorphic manifest schema unifying task manifests and capsule traces. DAG-linking via parent_capsule_digest + fork_root_digest. Status space: pending | confirmed | invalidated | running | cancelled.",
   "type": "object",
   "required": ["id", "kind", "status", "created_at"],
   "properties": {
@@ -13,12 +13,12 @@
     "kind": {
       "type": "string",
       "enum": ["task", "capsule"],
-      "description": "Polymorphic routing hint: 'task' for task manifests, 'capsule' for capsule traces. Consumers dispatch on this field."
+      "description": "Polymorphic discriminator / routing hint: 'task' for task manifests, 'capsule' for capsule traces. Doubles as routing hint for workspace-file agents."
     },
     "status": {
       "type": "string",
-      "enum": ["pending", "running", "completed", "failed", "superseded", "unknown"],
-      "description": "Execution status. 'superseded' marks a record replaced via DAG-link; 'unknown' is an explicit evidence gap (never guess)."
+      "enum": ["pending", "confirmed", "invalidated", "running", "cancelled"],
+      "description": "Execution status agreed in the 7/29 Lyra discussion."
     },
     "created_at": {
       "type": "string",
