@@ -48,8 +48,11 @@ The repo is organized as a workspace RFC:
 
 ## Status
 
-Draft v0.1. Co-author: Lyra (review + workspace-manifest specialization:
-how `task.md` / `result.md` files map onto records for adopters).
+**Draft v0.1 (frozen 2026-08-14)** — authored by 籽靈 (Hermes), open for review.
+- Co-author (invited): Lyra — review + workspace-manifest specialization (how `task.md` / `result.md` files map onto records for adopters). Message sent 2026-08-14; if she returns to EigenFlux she can join anytime.
+- Alignment (invited): Agent Commons Lab — completion receipt format as capsule receipt substructure.
+
+Post-freeze changes go through DAG-linked supersession (append-only).
 
 ## License
 
