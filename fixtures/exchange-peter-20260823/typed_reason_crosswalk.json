@@ -1,0 +1,85 @@
+{
+  "crosswalk_version": "1.0",
+  "project": "workspace-manifest",
+  "author": "ziling (DreamStarZ)",
+  "created_at": "2026-08-23T09:50:00+08:00",
+  "vocabulary_design_principle": "stage 與 reason 正交——stage 回答「走到哪」，typed_reason 回答「為什麼不能前進」",
+  "stages": [
+    "DISCOVERED",
+    "SCREENED",
+    "VALIDATED",
+    "DELIVERED",
+    "RECONCILE"
+  ],
+  "verdicts": [
+    "PASS",
+    "REJECT",
+    "UNKNOWN",
+    "QUARANTINE"
+  ],
+  "typed_reasons": [
+    {
+      "reason": "CONSERVATION_VIOLATION",
+      "applies_to_verdict": "REJECT",
+      "boundary_class": "delivery_boundary",
+      "meaning": "守恆等式不成立（expanded+skipped≠scanned）",
+      "escalation": "auto-reject, no retry"
+    },
+    {
+      "reason": "PREMISE_INVALID",
+      "applies_to_verdict": "QUARANTINE",
+      "boundary_class": "premise_boundary",
+      "meaning": "前提失效（環境/時鐘/依賴變化），結果本身可能仍正確",
+      "escalation": "reconcile_track with unknown_state 4-field"
+    },
+    {
+      "reason": "SCHEMA_MISMATCH",
+      "applies_to_verdict": "REJECT",
+      "boundary_class": "ingress_boundary",
+      "meaning": "manifest schema 驗證失敗",
+      "escalation": "fail_closed, 整份拒收不部分解析"
+    },
+    {
+      "reason": "SOURCE_STALE",
+      "applies_to_verdict": "QUARANTINE",
+      "boundary_class": "freshness_boundary",
+      "meaning": "來源數據過期",
+      "escalation": "refresh then re-validate"
+    },
+    {
+      "reason": "DATA_GAP",
+      "applies_to_verdict": "UNKNOWN",
+      "boundary_class": "completeness_boundary",
+      "meaning": "必要字段缺失但無法判定是漏報還是不適用",
+      "escalation": "unknown_state pending with owner/deadline"
+    },
+    {
+      "reason": "EPOCH_FENCE_TRIGGERED",
+      "applies_to_verdict": "QUARANTINE",
+      "boundary_class": "fence_boundary",
+      "meaning": "epoch fence 外部觸發（非 verifier 內部推理）",
+      "escalation": "external trigger review"
+    }
+  ],
+  "unknown_state_spec": {
+    "description": "UNKNOWN 不是失敗分支，是帶四字段的待定狀態",
+    "required_fields": [
+      "owner",
+      "deadline",
+      "next_trigger",
+      "reopen_condition"
+    ],
+    "constraint": "next_trigger 必須是可執行條件，不是自然語言描述",
+    "track": "reconcile_track (issuer 單方面不可覆蓋)"
+  },
+  "hash_binding": {
+    "algorithm": "SHA-256",
+    "canonicalization": "JCS + NFC-strict",
+    "note": "與 canonicalization_manifest.json 一致"
+  },
+  "open_questions_for_partner": [
+    "CONSERVATION_VIOLATION 在 bounded-drain 的對應 typed_reason 是什麼？",
+    "PREMISE_INVALID 的 escalation 路徑你們走 reconcile 還是直接降級？",
+    "EPOCH_FENCE_TRIGGERED 的 boundary_class 歸屬是否同意歸 fence_boundary？"
+  ]
+}

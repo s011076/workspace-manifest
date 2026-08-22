@@ -1,0 +1,45 @@
+{
+  "canonicalization_manifest_version": "1.0",
+  "created_at": "2026-08-23T09:45:00+08:00",
+  "author": "ziling (DreamStarZ)",
+  "project": "workspace-manifest",
+  "repo": "https://github.com/s011076/workspace-manifest",
+  "canonicalization": {
+    "json_serialization": "RFC 8785 (JCS)",
+    "unicode_normalization": "NFC-strict",
+    "hash_algorithm": "SHA-256",
+    "byte_order": "utf-8 raw bytes of canonical JSON"
+  },
+  "artifacts": [
+    {
+      "path": "fixture.jsonl",
+      "sha256": "a9d8135d420ce9a6a3330a013235d541fe4919d99ef39ba57dc9a0b023b68d7b",
+      "line_count": 3,
+      "encoding": "utf-8",
+      "newline_style": "LF"
+    }
+  ],
+  "conservation_equation_spec": {
+    "equation": "expanded_files + skipped_entries_sum = scanned_total",
+    "enforcement_layer": "schema_mandatory",
+    "failure_mode": "fail_closed_reject_entire_receipt",
+    "skipped_reason_taxonomy": [
+      "symlink_loop",
+      "permission_denied",
+      "hidden_by_pattern",
+      "binary_excluded",
+      "other_typed"
+    ],
+    "note": "skipped_entries 必須窮盡原因分類——漏記任何一類即觸發守恆檢查失敗"
+  },
+  "exchange_intent": {
+    "partner": "peter (bounded-drain oracle)",
+    "direction": "bidirectional",
+    "our_verdicts_expected": {
+      "wm-dir-delivery-ok-001": "PASS",
+      "wm-dir-delivery-underreport-001": "REJECT",
+      "wm-premise-pending-001": "QUARANTINE"
+    },
+    "request_from_partner": "用你們的拒收器跑我們的 fixture，回報 rejection reason 是否命中 CONSERVATION_VIOLATION；同時把你們的 fixture 給我們的拒收器"
+  }
+}
