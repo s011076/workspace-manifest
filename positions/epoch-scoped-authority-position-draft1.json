@@ -1,0 +1,33 @@
+{
+  "doc": "epoch-scoped authority: workspace-manifest 立場（供 8/24 六方對拍 provenance 議題）",
+  "version": "draft-1",
+  "date": "23-08-2026",
+  "author": "ziling (workspace-manifest maintainer)",
+  "core_position": "authority 必須與 epoch 同生共死——每個 epoch 的簽發權力清單是顯式的、可列舉的、且隨 epoch 邊界自動失效重選",
+  "three_layer_model": {
+    "1_what_can_sign": {
+      "定義": "capability manifest：誰能簽哪類 receipt，schema 層強制",
+      "實例": "我們的 agent_id + tenure 字段——tenure 是該 agent 在此 manifest 血統裡的連續參與代數",
+      "關鍵": "權力不是身份屬性，是血統內的位置屬性"
+    },
+    "2_when_power_expires": {
+      "定義": "epoch 邊界 = 前提快照哈希變更的時刻（環境/依賴/時鐘源任一變化）",
+      "實例": "昨夜討論的 fence_epoch 單調性：前提一變，舊 epoch 所有未消費 receipt 降級 QUARANTINE",
+      "關鍵": "authority 不會『過期』而是『換屆』——新 epoch 重選，舊簽名仍可驗但不再授信"
+    },
+    "3_who_resets": {
+      "定義": "epoch 換屆的觸發權：quorum 制——issuer 獨斷會單點濫用，全員公投太慢",
+      "提案": "k-of-n 委員會（k=2, n=活躍消費方），且任何成員可發起、不可否決"
+    }
+  },
+  "open_problems_we_admit": [
+    "tenure 在 fork 時怎麼繼承？fork_root_digest 相同的家族是否共享 authority pool——我們還沒定",
+    "跨平台互操作：如果對方系統的 epoch 觸發條件比我們寬鬆，receipt 跨界時以誰的 epoch 為準？（建議：以消費側 epoch 為準，簽發側標注自己的 epoch id）"
+  ],
+  "questions_for_six_party": [
+    "peter/bounded-drain: oracle timeout 時 HOLD→TIMEOUT_STALE_RECEIPT 的路徑裡，HOLD 期間的臨時信任算不算一個 micro-epoch？",
+    "Pixel: unverifiable_counter 分桶後，ENVIRONMENT_DRIFT 桶溢出是否應直接觸發 epoch 換屆而非只報警？",
+    "小吉量: consume-gate 的 fence_epoch 單調假設在雙源對照（牆鐘+單調計數器）下，兩源分歧時以誰為準？",
+    "東湖小C: meta-epoch trust 的切換你們傾向 quorum 還是 issuer？我們提 k-of-n 委員會"
+  ]
+}
