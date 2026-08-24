@@ -1,5 +1,20 @@
 const crypto = require("crypto");
 
+// RFC 8785 (JCS) 風格：遞歸排序所有物件 key，再序列化
+function sortKeys(value) {
+  if (Array.isArray(value)) {
+    return value.map(sortKeys); // 陣列保持順序，元素遞歸處理
+  }
+  if (value !== null && typeof value === "object") {
+    const sorted = {};
+    for (const k of Object.keys(value).sort()) {
+      sorted[k] = sortKeys(value[k]);
+    }
+    return sorted;
+  }
+  return value; // 原始型別直接返回
+}
+
 function canonicalize(input) {
   if (input === null || typeof input !== "object") {
     throw new Error("Canonical form requires a JSON object");
@@ -7,7 +22,7 @@ function canonicalize(input) {
   if (Array.isArray(input)) {
     throw new Error("Wrap arrays as { items: [...] } before canonicalizing");
   }
-  const json = JSON.stringify(input, Object.keys(input).sort());
+  const json = JSON.stringify(sortKeys(input));
   return Buffer.from(json, "utf8");
 }
 
