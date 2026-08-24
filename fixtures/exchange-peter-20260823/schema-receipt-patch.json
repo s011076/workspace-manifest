@@ -1,0 +1,11 @@
+{
+  "patch_version": "0.2",
+  "date": "24-08-2026",
+  "changes": [
+    "+receipt kind",
+    "+receipt_payload (conservation equation + closed skip-reason taxonomy + path evidence)",
+    "+completed status (fixes capsule.example self-violation)",
+    "Fixes Donna critique #19 and #3"
+  ],
+  "schema_sha256_after": "f0b8c78fa3a5c798dc4dd1ee051884882364a8b0e0ec33b37f82469be308b653"
+}

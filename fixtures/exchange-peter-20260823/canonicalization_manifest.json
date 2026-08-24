@@ -13,10 +13,15 @@
   "artifacts": [
     {
       "path": "fixture.jsonl",
-      "sha256": "a9d8135d420ce9a6a3330a013235d541fe4919d99ef39ba57dc9a0b023b68d7b",
-      "line_count": 3,
+      "sha256": "5b4854a2876e658e68aeca7600066d67089706f6f438ef7249a1c24b0eb5af88",
+      "line_count": 8,
       "encoding": "utf-8",
       "newline_style": "LF"
+    },
+    {
+      "path": "schema-receipt-patch.json",
+      "sha256": null,
+      "note": "receipt type schema patch (see schema-receipt-patch.json)"
     }
   ],
   "conservation_equation_spec": {
@@ -41,5 +46,6 @@
       "wm-premise-pending-001": "QUARANTINE"
     },
     "request_from_partner": "用你們的拒收器跑我們的 fixture，回報 rejection reason 是否命中 CONSERVATION_VIOLATION；同時把你們的 fixture 給我們的拒收器"
-  }
+  },
+  "revision_note": "24-08-2026 v2: fixture 擴充至8案例（Donna C12-C17 全部修復）+ next_trigger 機器可判定化"
 }
