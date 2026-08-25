@@ -111,44 +111,123 @@
     "EPOCH_FENCE_TRIGGERED 的 boundary_class 歸屬是否同意歸 fence_boundary？"
   ],
   "discrimination_tree": {
-    "purpose": "verifier 分流判別樹——同一事件不再兩個部門都能接",
-    "rules": [
+    "description": "Decision tree for selecting the correct typed_reason at verification boundaries",
+    "root": "Is the receipt structure valid (schema conformance)?",
+    "branches": [
       {
-        "if": "觸發源是 verifier 外部系統（外部 fence 信號）",
-        "then": "EPOCH_FENCE_TRIGGERED"
+        "condition": "NO → schema malformed",
+        "result": "SCHEMA_MISMATCH",
+        "next_action": "REJECT immediately"
       },
       {
-        "if": "verifier 內部推理發現前提漂移",
-        "then": "PREMISE_INVALID"
-      },
-      {
-        "if": "有新鮮度欄位且過期",
-        "then": "SOURCE_STALE"
-      },
-      {
-        "if": "新鮮度欄位缺失",
-        "then": "DATA_GAP"
-      },
-      {
-        "if": "密碼學驗證失敗（優先級最高，先於以上全部）",
-        "then": "SIGNATURE_INVALID / REPLAY_DETECTED"
-      },
-      {
-        "if": "結構驗證失敗（第二優先級）",
-        "then": "SCHEMA_MISMATCH"
-      },
-      {
-        "if": "簽發者越權（第三優先級）",
-        "then": "AUTHZ_DENIED"
+        "condition": "YES → does the conservation equation balance?",
+        "branches": [
+          {
+            "condition": "NO → count mismatch",
+            "result": "CONSERVATION_VIOLATION",
+            "next_action": "REJECT"
+          },
+          {
+            "condition": "YES → is the premise/receipt within freshness window?",
+            "branches": [
+              {
+                "condition": "NO → stale",
+                "result": "STALENESS_EXCEEDED",
+                "next_action": "QUARANTINE + re-validate"
+              },
+              {
+                "condition": "YES → is the signature valid?",
+                "branches": [
+                  {
+                    "condition": "NO → signature bad",
+                    "result": "SIGNATURE_INVALID",
+                    "next_action": "REJECT"
+                  },
+                  {
+                    "condition": "YES → is this a replay?",
+                    "branches": [
+                      {
+                        "condition": "YES → duplicate",
+                        "result": "REPLAY_DETECTED",
+                        "next_action": "REJECT"
+                      },
+                      {
+                        "condition": "NO → is content tampered?",
+                        "branches": [
+                          {
+                            "condition": "YES → digest mismatch",
+                            "result": "CONTENT_TAMPERED",
+                            "next_action": "REJECT"
+                          },
+                          {
+                            "condition": "NO → is authorization valid?",
+                            "branches": [
+                              {
+                                "condition": "NO → no permission",
+                                "result": "AUTHZ_DENIED",
+                                "next_action": "QUARANTINE + request authz"
+                              },
+                              {
+                                "condition": "YES → is data available?",
+                                "branches": [
+                                  {
+                                    "condition": "NO → missing data",
+                                    "result": "DATA_GAP",
+                                    "next_action": "QUARANTINE + retry"
+                                  },
+                                  {
+                                    "condition": "YES → is the source relevant?",
+                                    "branches": [
+                                      {
+                                        "condition": "NO → wrong source",
+                                        "result": "PREMISE_INVALID",
+                                        "next_action": "QUARANTINE + re-scope"
+                                      },
+                                      {
+                                        "condition": "YES → is epoch compatible?",
+                                        "branches": [
+                                          {
+                                            "condition": "NO → version fence",
+                                            "result": "EPOCH_FENCE_TRIGGERED",
+                                            "next_action": "QUARANTINE + upgrade"
+                                          },
+                                          {
+                                            "condition": "YES → all checks pass",
+                                            "result": "PASS",
+                                            "next_action": "accept delivery"
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     ],
-    "priority_order": [
-      "crypto_boundary",
-      "ingress(SCHEMA_MISMATCH)",
-      "authz_boundary",
-      "fence_boundary",
-      "premise_boundary",
-      "freshness_boundary"
+    "edge_cases": [
+      {
+        "scenario": "Multiple skip reasons coexist",
+        "rule": "Each skipped entry gets its own typed_reason; overall verdict is PASS if conservation holds"
+      },
+      {
+        "scenario": "Unknown reason for skip",
+        "rule": "Use UNKNOWN; consumer may QUARANTINE pending investigation"
+      },
+      {
+        "scenario": "Committee action targets specific agents",
+        "rule": "Check for censorship risk: non-retroactive + dissent preserved + appeal window"
+      }
     ]
   },
   "max_skew_proposal": {
@@ -182,5 +261,7 @@
     "grace_period": "邊界前簽發的 receipt 保留信任至自然消費期限，或走低成本快速重驗",
     "cooldown_and_audit": "觸發必須附 typed_reason + 冷卻期；輕率觸發事後可審計"
   },
-  "revision_note": "24-08-2026 v1.1: +4 詞條（crypto/authz/integrity boundary）+判別樹+max_skew 提案+k-of-n 防護條款"
+  "revision_note": "24-08-2026 v1.1: +4 詞條（crypto/authz/integrity boundary）+判別樹+max_skew 提案+k-of-n 防護條款",
+  "version": "1.2",
+  "updated_at": "2026-08-25"
 }

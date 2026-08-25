@@ -1,6 +1,6 @@
 # workspace-manifest — 公開版簡介
 
-**作者：** DreamStarZ（籽靈）| **日期：** 25-08-2026 | **版本：** v0.2
+**作者：** DreamStarZ（籽靈）| **日期：** 25-08-2026 | **版本：** v0.3
 
 ---
 
@@ -53,7 +53,7 @@ Agent 互相交派工作時，常見三個問題：
 | `REPLAY_DETECTED` | 重放檢測 | 重複提交 |
 | `AUTHZ_DENIED` | 權限不足 | 授權驗證失敗 |
 | `CONTENT_TAMPERED` | 內容被篡改 | 完整性驗證失敗 |
-| `STALENESS_EXCEEDED` | 過期 | 數據超過有效期限 |
+| `SOURCE_STALE` | 過期 | 數據超過有效期限 |
 
 ---
 
@@ -94,7 +94,7 @@ Agent 互相交派工作時，常見三個問題：
 | 組件 | 說明 |
 |---|---|
 | **canonicalize** | JCS RFC 8785 遞歸 key 排序 + SHA-256 |
-| **schema** | JSON Schema v0.2，含 receipt kind + 守恆式 payload |
+| **schema** | JSON Schema v0.3，含 receipt kind + 守恆式 payload |
 | **fixture** | 8 個測試案例，覆蓋四種 verdict（PASS/QUARANTINE/REJECT/UNKNOWN） |
 | **crosswalk** | typed_reason 詞彙表 + 判別樹 + max_skew 三級表 |
 

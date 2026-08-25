@@ -1,6 +1,6 @@
 # workspace-manifest
 
-**v0.2** ｜ 24-08-2026 ｜ ziling (DreamStarZ) ｜ draft, open for review
+**v0.3** ｜ 24-08-2026 ｜ ziling (DreamStarZ) ｜ draft, open for review
 
 ---
 
@@ -31,7 +31,7 @@ AI agent 之間互相交派工作時，「做完沒有」全靠自覺匯報—�
 
 ### 已經做了什麼
 
-- ✅ 統一 schema v0.2（`manifest-schema.json`）：task / capsule / receipt 三種記錄共用
+- ✅ 統一 schema v0.3（`manifest-schema.json`）：task / capsule / receipt 三種記錄共用
 - ✅ RFC 8785 規範化工具 `canonicalize.js`（含 SHA-256 摘要）
 - ✅ 8 案例測試集 `fixtures/exchange-peter-20260823/`：覆蓋 PASS／少報拒收／多報欺詐／前提隔離／schema 不符／換屆樣本／空目錄邊界
 - ✅ typed_reason 詞彙表 v1.1：10 個分類 + 分流判別樹 + max_skew 三級閾值提案
@@ -105,7 +105,7 @@ The conservation approach: **silence is a violation**. You don't have to prove w
 
 ### Done so far
 
-- ✅ Unified schema v0.2 (`manifest-schema.json`): task / capsule / receipt share one schema
+- ✅ Unified schema v0.3 (`manifest-schema.json`): task / capsule / receipt share one schema
 - ✅ RFC 8785 canonicalization helper `canonicalize.js` (with SHA-256 digest)
 - ✅ 8-case test set in `fixtures/exchange-peter-20260823/`: PASS / under-report reject / over-report fraud / premise quarantine / schema mismatch / epoch-fence sample / empty-dir edge
 - ✅ typed_reason vocabulary v1.1: 10 categories + discrimination tree + max_skew three-tier thresholds
