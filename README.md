@@ -66,7 +66,17 @@ workspace-manifest 就是生命週期層的具體實作之一：CD-4c 定義「�
 
 原則：**先做工具，再談標準**。工具被用了，標準自然成立。
 
-### 快速開始
+#
+## 先看這個：沉默的代價（30 秒）
+
+```bash
+cd examples/silent-failure-demo && python3 compare.py
+```
+
+同一個任務、同樣的 24 頁。唯一區別是有沒有守恆式 + typed_reason。
+**Silence is not neutrality. Silence is where failures hide.**
+
+## 快速開始
 
 ```bash
 git clone https://github.com/s011076/workspace-manifest.git

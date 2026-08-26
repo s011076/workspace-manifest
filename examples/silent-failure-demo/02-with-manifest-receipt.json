@@ -1,0 +1,33 @@
+{
+  "fixture_id": "DEMO-batch-042",
+  "type": "directory_delivery_receipt",
+  "stage": "verification",
+  "conservation_equation": {
+    "expanded_files": 18,
+    "skipped_entries": [
+      {
+        "reason": "DATA_GAP",
+        "count": 3,
+        "evidence": "source DB returned NULL for record IDs 1041,1042,1057"
+      },
+      {
+        "reason": "AUTHZ_DENIED",
+        "count": 2,
+        "evidence": "service account lacks read:/secure/pages/"
+      },
+      {
+        "reason": "PREMISE_INVALID",
+        "count": 1,
+        "evidence": "page.html corrupted at source; excluded pending re-export"
+      }
+    ],
+    "scanned_total": 24
+  },
+  "typed_reason_per_skip": true,
+  "expected_verdict": "PASS_WITH_CONDITIONS",
+  "assertions": [
+    "conservation holds: 18+6=24",
+    "every skip has typed_reason + evidence",
+    "consumer knows EXACTLY what was NOT delivered before publishing"
+  ]
+}
