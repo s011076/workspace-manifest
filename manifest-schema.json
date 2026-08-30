@@ -1,177 +1,205 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/s011076/workspace-manifest/blob/main/manifest-schema.json",
-  "title": "workspace-manifest unified schema",
-  "description": "Kind-polymorphic manifest schema unifying task manifests and capsule traces. DAG-linking via parent_capsule_digest + fork_root_digest. Status space: pending | confirmed | invalidated | running | cancelled. | v0.2: +receipt kind, +conservation payload, +completed status.",
-  "type": "object",
-  "required": [
-    "id",
-    "kind",
-    "status",
-    "created_at"
-  ],
-  "properties": {
-    "id": {
-      "type": "string",
-      "description": "Stable identity for this manifest record."
-    },
-    "kind": {
-      "type": "string",
-      "enum": [
-        "task",
-        "capsule",
-        "receipt"
-      ],
-      "description": "Polymorphic discriminator / routing hint: 'task' for task manifests, 'capsule' for capsule traces. Doubles as routing hint for workspace-file agents."
-    },
-    "status": {
-      "type": "string",
-      "enum": [
-        "pending",
-        "confirmed",
-        "invalidated",
-        "running",
-        "cancelled",
-        "completed"
-      ],
-      "description": "Execution status agreed in the 7/29 Lyra discussion."
-    },
-    "created_at": {
-      "type": "string",
-      "format": "date-time",
-      "description": "UTC ISO-8601 creation timestamp."
-    },
-    "updated_at": {
-      "type": "string",
-      "format": "date-time",
-      "description": "UTC ISO-8601 last mutation timestamp."
-    },
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://github.com/s011076/workspace-manifest/blob/main/manifest-schema.json",
+ "title": "workspace-manifest unified schema",
+ "description": "Kind-polymorphic manifest schema unifying task manifests and capsule traces. DAG-linking via parent_capsule_digest + fork_root_digest. Status space: pending | confirmed | invalidated | running | cancelled. | v0.2: +receipt kind, +conservation payload, +completed status.",
+ "type": "object",
+ "required": [
+  "id",
+  "kind",
+  "status",
+  "created_at"
+ ],
+ "properties": {
+  "id": {
+   "type": "string",
+   "description": "Stable identity for this manifest record."
+  },
+  "kind": {
+   "type": "string",
+   "enum": [
+    "task",
+    "capsule",
+    "receipt"
+   ],
+   "description": "Polymorphic discriminator / routing hint: 'task' for task manifests, 'capsule' for capsule traces. Doubles as routing hint for workspace-file agents."
+  },
+  "status": {
+   "type": "string",
+   "enum": [
+    "pending",
+    "confirmed",
+    "invalidated",
+    "running",
+    "cancelled",
+    "completed"
+   ],
+   "description": "Execution status agreed in the 7/29 Lyra discussion."
+  },
+  "created_at": {
+   "type": "string",
+   "format": "date-time",
+   "description": "UTC ISO-8601 creation timestamp."
+  },
+  "updated_at": {
+   "type": "string",
+   "format": "date-time",
+   "description": "UTC ISO-8601 last mutation timestamp."
+  },
+  "agent_id": {
+   "type": "string",
+   "description": "The agent identity that authored this record."
+  },
+  "digest": {
+   "type": "string",
+   "description": "Canonical sha256 hex of the canonicalized record body (JCS RFC 8785 + NFC strict)."
+  },
+  "parent_capsule_digest": {
+   "type": [
+    "string",
+    "null"
+   ],
+   "description": "DAG-link: digest of the parent capsule this record extends or mutates. null for root records."
+  },
+  "fork_root_digest": {
+   "type": [
+    "string",
+    "null"
+   ],
+   "description": "DAG-link: digest of the root of the fork lineage. Identical across a fork family; null when no fork."
+  },
+  "effect_manifest": {
+   "type": [
+    "object",
+    "null"
+   ],
+   "description": "Capsule-only: attested effects (pre_state / operation / post_state / expected_verdict)."
+  },
+  "tenant": {
+   "type": "object",
+   "properties": {
     "agent_id": {
-      "type": "string",
-      "description": "The agent identity that authored this record."
+     "type": "string",
+     "description": "Tenure counter scope."
     },
-    "digest": {
-      "type": "string",
-      "description": "Canonical sha256 hex of the canonicalized record body (JCS RFC 8785 + NFC strict)."
+    "tenure": {
+     "type": "integer",
+     "minimum": 0,
+     "description": "Monotonic tenure counter; prevents replay."
+    }
+   }
+  },
+  "receipt_payload": {
+   "type": [
+    "object",
+    "null"
+   ],
+   "description": "Receipt-only: directory delivery conservation fields. skipped_entries reasons must be from the closed taxonomy — silence is a violation.",
+   "properties": {
+    "scanned_total": {
+     "type": "integer",
+     "minimum": 0
     },
-    "parent_capsule_digest": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "description": "DAG-link: digest of the parent capsule this record extends or mutates. null for root records."
+    "expanded_files": {
+     "type": "integer",
+     "minimum": 0
     },
-    "fork_root_digest": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "description": "DAG-link: digest of the root of the fork lineage. Identical across a fork family; null when no fork."
-    },
-    "effect_manifest": {
-      "type": [
-        "object",
-        "null"
-      ],
-      "description": "Capsule-only: attested effects (pre_state / operation / post_state / expected_verdict)."
-    },
-    "tenant": {
+    "skipped_entries": {
+     "type": "array",
+     "items": {
       "type": "object",
       "properties": {
-        "agent_id": {
-          "type": "string",
-          "description": "Tenure counter scope."
-        },
-        "tenure": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "Monotonic tenure counter; prevents replay."
+       "reason": {
+        "enum": [
+         "symlink_loop",
+         "permission_denied",
+         "hidden_by_pattern",
+         "binary_excluded",
+         "other_typed"
+        ]
+       },
+       "count": {
+        "type": "integer",
+        "minimum": 0
+       },
+       "paths": {
+        "type": "array",
+        "items": {
+         "type": "string"
         }
-      }
-    },
-    "receipt_payload": {
-      "type": [
-        "object",
-        "null"
-      ],
-      "description": "Receipt-only: directory delivery conservation fields. skipped_entries reasons must be from the closed taxonomy — silence is a violation.",
-      "properties": {
-        "scanned_total": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "expanded_files": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "skipped_entries": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "reason": {
-                "enum": [
-                  "symlink_loop",
-                  "permission_denied",
-                  "hidden_by_pattern",
-                  "binary_excluded",
-                  "other_typed"
-                ]
-              },
-              "count": {
-                "type": "integer",
-                "minimum": 0
-              },
-              "paths": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "required": [
-              "reason",
-              "count"
-            ]
-          }
-        }
+       }
       },
       "required": [
-        "scanned_total",
-        "expanded_files",
-        "skipped_entries"
+       "reason",
+       "count"
       ]
+     }
     }
+   },
+   "required": [
+    "scanned_total",
+    "expanded_files",
+    "skipped_entries"
+   ]
   },
-  "allOf": [
-    {
-      "if": {
-        "properties": {
-          "kind": {
-            "const": "task"
-          }
-        }
-      },
-      "then": {
-        "required": [
-          "status"
-        ]
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "kind": {
-            "const": "capsule"
-          }
-        }
-      },
-      "then": {
-        "required": [
-          "effect_manifest",
-          "digest"
-        ]
-      }
+  "schema_version": {
+   "type": "string",
+   "pattern": "^v?0\\.[0-9]+$",
+   "description": "Receipt schema version at signing time. Cross-version validation: v0.3 receipts missing effect_ts are QUARANTINE (CROSS_VERSION_SCHEMA), not REJECT."
+  },
+  "effect_ts": {
+   "type": "string",
+   "format": "date-time",
+   "description": "UTC ISO-8601 effective timestamp: the moment the governing policy/skill version actually took effect. Hard field from v0.4 (runner-enforced); mandatory in signed_context so issuers cannot repudiate policy-timing knowledge."
+  },
+  "observation_date": {
+   "type": "string",
+   "format": "date-time",
+   "description": "UTC ISO-8601: when the receipt's premise assumptions were captured. Bound to policy_version effective time (not canonicalized_input). Verifier freshness checks run on this axis."
+  },
+  "max_skew_ms": {
+   "type": "integer",
+   "minimum": 0,
+   "description": "Green-zone clock skew threshold in milliseconds (wall clock). Amber = [max_skew, 10x] → QUARANTINE; red = >10x → REJECT. Orthogonal to epoch-boundary counting (EPOCH_FENCE_TRIGGERED)."
+  },
+  "fence_epoch": {
+   "type": "integer",
+   "description": "Epoch at receipt signing (premise snapshot hash generation)."
+  },
+  "effect_epoch": {
+   "type": "integer",
+   "description": "Epoch at effect time. Differs from fence_epoch → EPOCH_FENCE_TRIGGERED → QUARANTINE when conservation holds."
+  }
+ },
+ "allOf": [
+  {
+   "if": {
+    "properties": {
+     "kind": {
+      "const": "task"
+     }
     }
-  ]
+   },
+   "then": {
+    "required": [
+     "status"
+    ]
+   }
+  },
+  {
+   "if": {
+    "properties": {
+     "kind": {
+      "const": "capsule"
+     }
+    }
+   },
+   "then": {
+    "required": [
+     "effect_manifest",
+     "digest"
+    ]
+   }
+  }
+ ]
 }

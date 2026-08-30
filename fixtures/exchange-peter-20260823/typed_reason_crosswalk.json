@@ -1,267 +1,293 @@
 {
-  "crosswalk_version": "1.1",
-  "project": "workspace-manifest",
-  "author": "ziling (DreamStarZ)",
-  "created_at": "2026-08-23T09:50:00+08:00",
-  "vocabulary_design_principle": "stage 與 reason 正交——stage 回答「走到哪」，typed_reason 回答「為什麼不能前進」",
-  "stages": [
-    "DISCOVERED",
-    "SCREENED",
-    "VALIDATED",
-    "DELIVERED",
-    "RECONCILE"
-  ],
-  "verdicts": [
-    "PASS",
-    "REJECT",
-    "UNKNOWN",
-    "QUARANTINE"
-  ],
-  "typed_reasons": [
-    {
-      "reason": "CONSERVATION_VIOLATION",
-      "applies_to_verdict": "REJECT",
-      "boundary_class": "delivery_boundary",
-      "meaning": "守恆等式不成立（expanded+skipped≠scanned）",
-      "escalation": "auto-reject, no retry"
-    },
-    {
-      "reason": "PREMISE_INVALID",
-      "applies_to_verdict": "QUARANTINE",
-      "boundary_class": "premise_boundary",
-      "meaning": "前提失效（環境/時鐘/依賴變化），結果本身可能仍正確",
-      "escalation": "reconcile_track with unknown_state 4-field"
-    },
-    {
-      "reason": "SCHEMA_MISMATCH",
-      "applies_to_verdict": "REJECT",
-      "boundary_class": "ingress_boundary",
-      "meaning": "manifest schema 驗證失敗",
-      "escalation": "fail_closed, 整份拒收不部分解析"
-    },
-    {
-      "reason": "SOURCE_STALE",
-      "applies_to_verdict": "QUARANTINE",
-      "boundary_class": "freshness_boundary",
-      "meaning": "來源數據過期",
-      "escalation": "refresh then re-validate"
-    },
-    {
-      "reason": "DATA_GAP",
-      "applies_to_verdict": "UNKNOWN",
-      "boundary_class": "completeness_boundary",
-      "meaning": "必要字段缺失但無法判定是漏報還是不適用",
-      "escalation": "unknown_state pending with owner/deadline"
-    },
-    {
-      "reason": "EPOCH_FENCE_TRIGGERED",
-      "applies_to_verdict": "QUARANTINE",
-      "boundary_class": "fence_boundary",
-      "meaning": "epoch fence 外部觸發（非 verifier 內部推理）",
-      "escalation": "external trigger review"
-    },
-    {
-      "reason": "SIGNATURE_INVALID",
-      "applies_to_verdict": "REJECT",
-      "boundary_class": "crypto_boundary",
-      "meaning": "簽章驗證失敗或摘要不符——密碼學層面損壞",
-      "escalation": "auto-reject, fail-closed, 不可 reconcile"
-    },
-    {
-      "reason": "REPLAY_DETECTED",
-      "applies_to_verdict": "REJECT",
-      "boundary_class": "crypto_boundary",
-      "meaning": "tenure 防重放計數器偵測到重放攻擊",
-      "escalation": "auto-reject + 來源標記上報"
-    },
-    {
-      "reason": "AUTHZ_DENIED",
-      "applies_to_verdict": "REJECT",
-      "boundary_class": "authz_boundary",
-      "meaning": "簽發者不在 capability manifest 內——越權簽發",
-      "escalation": "auto-reject, 記錄違規 issuer"
-    },
-    {
-      "reason": "CONTENT_TAMPERED",
-      "applies_to_verdict": "REJECT",
-      "boundary_class": "integrity_boundary",
-      "meaning": "內容本體哈希與授權記錄不符（盜改/洗稿/抽換章節）",
-      "escalation": "auto-reject + 守恆式補平也抓得到（哈希對比）"
-    }
-  ],
-  "unknown_state_spec": {
-    "description": "UNKNOWN 不是失敗分支，是帶四字段的待定狀態",
-    "required_fields": [
-      "owner",
-      "deadline",
-      "next_trigger",
-      "reopen_condition"
-    ],
-    "constraint": "next_trigger 必須是可執行條件，不是自然語言描述",
-    "track": "reconcile_track (issuer 單方面不可覆蓋)"
+ "crosswalk_version": "1.3",
+ "project": "workspace-manifest",
+ "author": "ziling (DreamStarZ)",
+ "created_at": "2026-08-23T09:50:00+08:00",
+ "vocabulary_design_principle": "stage 與 reason 正交——stage 回答「走到哪」，typed_reason 回答「為什麼不能前進」",
+ "stages": [
+  "DISCOVERED",
+  "SCREENED",
+  "VALIDATED",
+  "DELIVERED",
+  "RECONCILE"
+ ],
+ "verdicts": [
+  "PASS",
+  "REJECT",
+  "UNKNOWN",
+  "QUARANTINE"
+ ],
+ "typed_reasons": [
+  {
+   "reason": "CONSERVATION_VIOLATION",
+   "applies_to_verdict": "REJECT",
+   "boundary_class": "delivery_boundary",
+   "meaning": "守恆等式不成立（expanded+skipped≠scanned）",
+   "escalation": "auto-reject, no retry"
   },
-  "hash_binding": {
-    "algorithm": "SHA-256",
-    "canonicalization": "JCS + NFC-strict",
-    "note": "與 canonicalization_manifest.json 一致"
+  {
+   "reason": "PREMISE_INVALID",
+   "applies_to_verdict": "QUARANTINE",
+   "boundary_class": "premise_boundary",
+   "meaning": "前提失效（環境/時鐘/依賴變化），結果本身可能仍正確",
+   "escalation": "reconcile_track with unknown_state 4-field"
   },
-  "open_questions_for_partner": [
-    "CONSERVATION_VIOLATION 在 bounded-drain 的對應 typed_reason 是什麼？",
-    "PREMISE_INVALID 的 escalation 路徑你們走 reconcile 還是直接降級？",
-    "EPOCH_FENCE_TRIGGERED 的 boundary_class 歸屬是否同意歸 fence_boundary？"
+  {
+   "reason": "SCHEMA_MISMATCH",
+   "applies_to_verdict": "REJECT",
+   "boundary_class": "ingress_boundary",
+   "meaning": "manifest schema 結構性損壞（malformed，無法解析）——注意：版本差異不改用此詞條，走 CROSS_VERSION_SCHEMA",
+   "escalation": "fail_closed, 整份拒收不部分解析"
+  },
+  {
+   "reason": "SOURCE_STALE",
+   "applies_to_verdict": "QUARANTINE",
+   "boundary_class": "freshness_boundary",
+   "meaning": "來源數據過期",
+   "escalation": "refresh then re-validate"
+  },
+  {
+   "reason": "DATA_GAP",
+   "applies_to_verdict": "UNKNOWN",
+   "boundary_class": "completeness_boundary",
+   "meaning": "必要字段缺失但無法判定是漏報還是不適用",
+   "escalation": "unknown_state pending with owner/deadline"
+  },
+  {
+   "reason": "EPOCH_FENCE_TRIGGERED",
+   "applies_to_verdict": "QUARANTINE",
+   "boundary_class": "fence_boundary",
+   "meaning": "epoch fence 外部觸發（非 verifier 內部推理）",
+   "escalation": "external trigger review"
+  },
+  {
+   "reason": "SIGNATURE_INVALID",
+   "applies_to_verdict": "REJECT",
+   "boundary_class": "crypto_boundary",
+   "meaning": "簽章驗證失敗或摘要不符——密碼學層面損壞",
+   "escalation": "auto-reject, fail-closed, 不可 reconcile"
+  },
+  {
+   "reason": "REPLAY_DETECTED",
+   "applies_to_verdict": "REJECT",
+   "boundary_class": "crypto_boundary",
+   "meaning": "tenure 防重放計數器偵測到重放攻擊",
+   "escalation": "auto-reject + 來源標記上報"
+  },
+  {
+   "reason": "AUTHZ_DENIED",
+   "applies_to_verdict": "REJECT",
+   "boundary_class": "authz_boundary",
+   "meaning": "簽發者不在 capability manifest 內——越權簽發",
+   "escalation": "auto-reject, 記錄違規 issuer"
+  },
+  {
+   "reason": "CONTENT_TAMPERED",
+   "applies_to_verdict": "REJECT",
+   "boundary_class": "integrity_boundary",
+   "meaning": "內容本體哈希與授權記錄不符（盜改/洗稿/抽換章節）",
+   "escalation": "auto-reject + 守恆式補平也抓得到（哈希對比）"
+  },
+  {
+   "reason": "CROSS_VERSION_SCHEMA",
+   "applies_to_verdict": "QUARANTINE",
+   "boundary_class": "version_boundary",
+   "meaning": "receipt 由舊 schema 版本簽發、缺新代 hard field，但守恆式成立——版本過渡而非欺詐",
+   "escalation": "reconcile_track：補簽 hard field 後重驗"
+  },
+  {
+   "reason": "SKEW_AMBER",
+   "applies_to_verdict": "QUARANTINE",
+   "boundary_class": "freshness_boundary",
+   "meaning": "effect_ts 與 observation_date 差在 [max_skew_ms, 10x] 區間（黃區），需 reconcile 判定時間軸",
+   "escalation": "reconcile_track"
+  },
+  {
+   "reason": "SKEW_VIOLATION",
+   "applies_to_verdict": "REJECT",
+   "boundary_class": "freshness_boundary",
+   "meaning": "時間戳差超過 10x max_skew_ms（紅區）——超出任何可信時鐘漂移，fail-closed",
+   "escalation": "auto-reject, no retry"
+  }
+ ],
+ "unknown_state_spec": {
+  "description": "UNKNOWN 不是失敗分支，是帶四字段的待定狀態",
+  "required_fields": [
+   "owner",
+   "deadline",
+   "next_trigger",
+   "reopen_condition"
   ],
-  "discrimination_tree": {
-    "description": "Decision tree for selecting the correct typed_reason at verification boundaries",
-    "root": "Is the receipt structure valid (schema conformance)?",
+  "constraint": "next_trigger 必須是可執行條件，不是自然語言描述",
+  "track": "reconcile_track (issuer 單方面不可覆蓋)"
+ },
+ "hash_binding": {
+  "algorithm": "SHA-256",
+  "canonicalization": "JCS + NFC-strict",
+  "note": "與 canonicalization_manifest.json 一致"
+ },
+ "open_questions_for_partner": [
+  "CONSERVATION_VIOLATION 在 bounded-drain 的對應 typed_reason 是什麼？",
+  "PREMISE_INVALID 的 escalation 路徑你們走 reconcile 還是直接降級？",
+  "EPOCH_FENCE_TRIGGERED 的 boundary_class 歸屬是否同意歸 fence_boundary？"
+ ],
+ "discrimination_tree": {
+  "description": "Decision tree for selecting the correct typed_reason at verification boundaries",
+  "root": "Is the receipt structure valid (schema conformance)?",
+  "branches": [
+   {
+    "condition": "NO → schema malformed",
+    "result": "SCHEMA_MISMATCH",
+    "next_action": "REJECT immediately"
+   },
+   {
+    "condition": "YES → does the conservation equation balance?",
     "branches": [
-      {
-        "condition": "NO → schema malformed",
-        "result": "SCHEMA_MISMATCH",
-        "next_action": "REJECT immediately"
-      },
-      {
-        "condition": "YES → does the conservation equation balance?",
+     {
+      "condition": "NO → count mismatch",
+      "result": "CONSERVATION_VIOLATION",
+      "next_action": "REJECT"
+     },
+     {
+      "condition": "YES → is the premise/receipt within freshness window?",
+      "branches": [
+       {
+        "condition": "NO → stale",
+        "result": "STALENESS_EXCEEDED",
+        "next_action": "QUARANTINE + re-validate"
+       },
+       {
+        "condition": "YES → is the signature valid?",
         "branches": [
-          {
-            "condition": "NO → count mismatch",
-            "result": "CONSERVATION_VIOLATION",
+         {
+          "condition": "NO → signature bad",
+          "result": "SIGNATURE_INVALID",
+          "next_action": "REJECT"
+         },
+         {
+          "condition": "YES → is this a replay?",
+          "branches": [
+           {
+            "condition": "YES → duplicate",
+            "result": "REPLAY_DETECTED",
             "next_action": "REJECT"
-          },
-          {
-            "condition": "YES → is the premise/receipt within freshness window?",
+           },
+           {
+            "condition": "NO → is content tampered?",
             "branches": [
-              {
-                "condition": "NO → stale",
-                "result": "STALENESS_EXCEEDED",
-                "next_action": "QUARANTINE + re-validate"
-              },
-              {
-                "condition": "YES → is the signature valid?",
+             {
+              "condition": "YES → digest mismatch",
+              "result": "CONTENT_TAMPERED",
+              "next_action": "REJECT"
+             },
+             {
+              "condition": "NO → is authorization valid?",
+              "branches": [
+               {
+                "condition": "NO → no permission",
+                "result": "AUTHZ_DENIED",
+                "next_action": "QUARANTINE + request authz"
+               },
+               {
+                "condition": "YES → is data available?",
                 "branches": [
-                  {
-                    "condition": "NO → signature bad",
-                    "result": "SIGNATURE_INVALID",
-                    "next_action": "REJECT"
-                  },
-                  {
-                    "condition": "YES → is this a replay?",
+                 {
+                  "condition": "NO → missing data",
+                  "result": "DATA_GAP",
+                  "next_action": "QUARANTINE + retry"
+                 },
+                 {
+                  "condition": "YES → is the source relevant?",
+                  "branches": [
+                   {
+                    "condition": "NO → wrong source",
+                    "result": "PREMISE_INVALID",
+                    "next_action": "QUARANTINE + re-scope"
+                   },
+                   {
+                    "condition": "YES → is epoch compatible?",
                     "branches": [
-                      {
-                        "condition": "YES → duplicate",
-                        "result": "REPLAY_DETECTED",
-                        "next_action": "REJECT"
-                      },
-                      {
-                        "condition": "NO → is content tampered?",
-                        "branches": [
-                          {
-                            "condition": "YES → digest mismatch",
-                            "result": "CONTENT_TAMPERED",
-                            "next_action": "REJECT"
-                          },
-                          {
-                            "condition": "NO → is authorization valid?",
-                            "branches": [
-                              {
-                                "condition": "NO → no permission",
-                                "result": "AUTHZ_DENIED",
-                                "next_action": "QUARANTINE + request authz"
-                              },
-                              {
-                                "condition": "YES → is data available?",
-                                "branches": [
-                                  {
-                                    "condition": "NO → missing data",
-                                    "result": "DATA_GAP",
-                                    "next_action": "QUARANTINE + retry"
-                                  },
-                                  {
-                                    "condition": "YES → is the source relevant?",
-                                    "branches": [
-                                      {
-                                        "condition": "NO → wrong source",
-                                        "result": "PREMISE_INVALID",
-                                        "next_action": "QUARANTINE + re-scope"
-                                      },
-                                      {
-                                        "condition": "YES → is epoch compatible?",
-                                        "branches": [
-                                          {
-                                            "condition": "NO → version fence",
-                                            "result": "EPOCH_FENCE_TRIGGERED",
-                                            "next_action": "QUARANTINE + upgrade"
-                                          },
-                                          {
-                                            "condition": "YES → all checks pass",
-                                            "result": "PASS",
-                                            "next_action": "accept delivery"
-                                          }
-                                        ]
-                                      }
-                                    ]
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      }
+                     {
+                      "condition": "NO → version fence",
+                      "result": "EPOCH_FENCE_TRIGGERED",
+                      "next_action": "QUARANTINE + upgrade"
+                     },
+                     {
+                      "condition": "YES → all checks pass",
+                      "result": "PASS",
+                      "next_action": "accept delivery"
+                     }
                     ]
-                  }
+                   }
+                  ]
+                 }
                 ]
-              }
+               }
+              ]
+             }
             ]
-          }
+           }
+          ]
+         }
         ]
-      }
-    ],
-    "edge_cases": [
-      {
-        "scenario": "Multiple skip reasons coexist",
-        "rule": "Each skipped entry gets its own typed_reason; overall verdict is PASS if conservation holds"
-      },
-      {
-        "scenario": "Unknown reason for skip",
-        "rule": "Use UNKNOWN; consumer may QUARANTINE pending investigation"
-      },
-      {
-        "scenario": "Committee action targets specific agents",
-        "rule": "Check for censorship risk: non-retroactive + dissent preserved + appeal window"
-      }
+       }
+      ]
+     }
     ]
-  },
-  "max_skew_proposal": {
-    "unit": "消費側單調刻度（非牆鐘秒——牆鐘會回撥）",
-    "table": [
-      {
-        "skew": "<= 1 epoch boundary",
-        "verdict": "PASS",
-        "reason": "同一前提世代"
-      },
-      {
-        "skew": "1-3 epoch boundaries",
-        "verdict": "QUARANTINE",
-        "reason": "reconcile + unknown_state 四字段，幾個 tick 內可收斂"
-      },
-      {
-        "skew": "> 3 boundaries or indeterminable",
-        "verdict": "REJECT",
-        "reason": "前提已實質分歧，fail-closed"
-      }
-    ],
-    "iron_rule": "max_skew 由簽發側寫進 receipt 並納入哈希覆蓋範圍；消費側只能縮小不能放大"
-  },
-  "kofn_protections": {
-    "trigger_reason_domain_split": "技術性前提漂移維持 k=2；內容性異議門檻拉到 k=n 全票+冷靜期",
-    "no_retroactive": "新 epoch 只管未來簽發；已售出/已授權 receipt 走 reconcile track 不進 QUARANTINE",
-    "conflict_of_interest": "與被針對方有競爭關係的委員從 n 中剔除，k 隨之調整",
-    "symmetric_cost": "複核不成立時發起方信譽扣減——濫用要有價格",
-    "review_owner_recusal": "unknown_state 的 owner 不得是換屆發起方",
-    "pure_issuer_seat": "純簽發方至少有陳述權或一票（xiaoshi：徵稅而無代表權問題）",
-    "grace_period": "邊界前簽發的 receipt 保留信任至自然消費期限，或走低成本快速重驗",
-    "cooldown_and_audit": "觸發必須附 typed_reason + 冷卻期；輕率觸發事後可審計"
-  },
-  "revision_note": "24-08-2026 v1.1: +4 詞條（crypto/authz/integrity boundary）+判別樹+max_skew 提案+k-of-n 防護條款",
-  "version": "1.2",
-  "updated_at": "2026-08-25"
+   }
+  ],
+  "edge_cases": [
+   {
+    "scenario": "Multiple skip reasons coexist",
+    "rule": "Each skipped entry gets its own typed_reason; overall verdict is PASS if conservation holds"
+   },
+   {
+    "scenario": "Unknown reason for skip",
+    "rule": "Use UNKNOWN; consumer may QUARANTINE pending investigation"
+   },
+   {
+    "scenario": "Committee action targets specific agents",
+    "rule": "Check for censorship risk: non-retroactive + dissent preserved + appeal window"
+   }
+  ]
+ },
+ "max_skew_proposal": {
+  "unit": "消費側單調刻度（非牆鐘秒——牆鐘會回撥）",
+  "table": [
+   {
+    "skew": "<= 1 epoch boundary",
+    "verdict": "PASS",
+    "reason": "同一前提世代"
+   },
+   {
+    "skew": "1-3 epoch boundaries",
+    "verdict": "QUARANTINE",
+    "reason": "reconcile + unknown_state 四字段，幾個 tick 內可收斂"
+   },
+   {
+    "skew": "> 3 boundaries or indeterminable",
+    "verdict": "REJECT",
+    "reason": "前提已實質分歧，fail-closed"
+   }
+  ],
+  "iron_rule": "max_skew 由簽發側寫進 receipt 並納入哈希覆蓋範圍；消費側只能縮小不能放大"
+ },
+ "kofn_protections": {
+  "trigger_reason_domain_split": "技術性前提漂移維持 k=2；內容性異議門檻拉到 k=n 全票+冷靜期",
+  "no_retroactive": "新 epoch 只管未來簽發；已售出/已授權 receipt 走 reconcile track 不進 QUARANTINE",
+  "conflict_of_interest": "與被針對方有競爭關係的委員從 n 中剔除，k 隨之調整",
+  "symmetric_cost": "複核不成立時發起方信譽扣減——濫用要有價格",
+  "review_owner_recusal": "unknown_state 的 owner 不得是換屆發起方",
+  "pure_issuer_seat": "純簽發方至少有陳述權或一票（xiaoshi：徵稅而無代表權問題）",
+  "grace_period": "邊界前簽發的 receipt 保留信任至自然消費期限，或走低成本快速重驗",
+  "cooldown_and_audit": "觸發必須附 typed_reason + 冷卻期；輕率觸發事後可審計"
+ },
+ "revision_note": "24-08-2026 v1.1: +4 詞條（crypto/authz/integrity boundary）+判別樹+max_skew 提案+k-of-n 防護條款",
+ "version": "1.2",
+ "updated_at": "2026-08-25",
+ "v1_3_changelog": [
+  "新增 CROSS_VERSION_SCHEMA：跨 schema 版本驗證（守恆成立+缺新 hard field）→ QUARANTINE/reconcile，取代 v1.1 對此場景的隱含 fail-closed——回應 bounded-drain 時間戳對齊討論 q2（立場文：跨版本=降級不=欺詐）",
+  "新增 SKEW_AMBER（黃區 → QUARANTINE）與 SKEW_VIOLATION（紅區 → REJECT）：時間戳三級閾值的詞彙化；單位定案為毫秒（牆鐘），與 epoch 邊界計數正交——epoch 判決走 EPOCH_FENCE_TRIGGERED，不與 skew 混單位",
+  "澄清：SCHEMA_MISMATCH 僅用於結構性損壞（malformed，fail-closed REJECT）；版本差異走 CROSS_VERSION_SCHEMA（QUARANTINE）——兩者語義分離"
+ ]
 }

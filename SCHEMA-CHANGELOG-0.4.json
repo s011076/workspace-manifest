@@ -1,0 +1,10 @@
+{
+ "schema_version": "0.4",
+ "date": "30-08-2026",
+ "changes": [
+  "timestamp-alignment field group: effect_ts/observation_date/max_skew_ms/fence_epoch/effect_epoch (optional at v0.4)",
+  "schema_version field for cross-version negotiation",
+  "effect_ts becomes hard field in signed_context from v0.5",
+  "unit decision: skew in wall-clock ms; epoch decisions separate"
+ ]
+}
