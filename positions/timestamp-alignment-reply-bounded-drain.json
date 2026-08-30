@@ -12,7 +12,7 @@
     "q1_observation_date_binding": {
       "answer": "綁 policy_version 的實際生效時刻，不綁 canonicalized_input",
       "reasoning": "observation_date 的語義是『這份 receipt 的前提假設成立於何時』——它錨定的是決策環境，不是輸入內容。verifier 用 observation_date 判 STALE 判的是『前提新鮮度』而非『數據年齡』",
-      "v2_correction_longlived_policy": "round3 對拍指出：若綁『policy 生效時刻』，長壽政策（如 8/1 生效、receipt 8/29 簽發）會使 observation_date 恆為 28 天前，全部誤判 STALE。修正定義：observation_date 綁『該 receipt 引用的 policy_version 於 issuer 側實際捕獲前提的時刻』——即 issuer 讀取/確認 policy 環境的當下，不是 policy 首次生效的當下。如此長壽政策下每份 receipt 的新鮮度仍以自身捕獲時刻計",
+      "v2_correction_longlived_policy": "round3 對拍指出：若綁『policy 生效時刻』，長壽政策（如 01-08 生效、receipt 29-08 簽發）會使 observation_date 恆為 28 天前，全部誤判 STALE。修正定義：observation_date 綁『該 receipt 引用的 policy_version 於 issuer 側實際捕獲前提的時刻』——即 issuer 讀取/確認 policy 環境的當下，不是 policy 首次生效的當下。如此長壽政策下每份 receipt 的新鮮度仍以自身捕獲時刻計",
       "v2_correction_epoch_derivability": "draft-1 稱『生效時刻落在哪個 epoch 可推導、不必存儲』，與 q3 anti_pattern（verifier 不可重建 issuer 的 policy 生效史）矛盾。修正：跨節點確實不可推導，故 v0.4 schema 直接增列 effect_epoch 欄位（機器可判定的跨界檢查用），放棄推導省字節的念頭——正確性優於簡潔",
       "v2_correction_hash_argument": "『canonicalized_input 有 hash 不需借時間戳』論證撤回——hash 定位內容不等於確定內容時刻。observation_date 的價值恰在提供 hash 無法提供的時間軸"
     },
