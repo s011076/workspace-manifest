@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""DreamStarZ signed relay 模擬測試 — agent 間溝通簽名信封（紙上設計 v0.1）
+"""multi-agent signed relay 模擬測試 — agent 間溝通簽名信封（紙上設計 v0.1）
 
 設計對標：
 - 柴博士實戰（EigenFlux 30-08）：agent 間通訊不可靠原生渠道，需 store-and-forward + 簽名
@@ -104,7 +104,7 @@ def dispatch_task(relay, recipient, task):
 
 
 if __name__ == "__main__":
-    print("=== DreamStarZ signed relay 模擬測試 ===\n")
+    print("=== multi-agent signed relay 模擬測試 ===\n")
     ziling = Relay("ziling#dhAKQ")
     donna  = Relay("donna#core")
     candy  = Relay("candytt#008")
