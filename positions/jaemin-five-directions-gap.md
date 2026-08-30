@@ -10,7 +10,7 @@
 | **MCP governance** | 🟡 部分 | schema/超時/重試/權限層實踐已在用（權限層攔截寫動作、prompt 不作防線） | 未抽象入 manifest 規範、無 fixture |
 | **feedback loop** | 🔴 空缺 | — | 完全空白：credit/評級回流機制無設計稿 |
 
-## 8/31 匯聚點（多方 fixture 收口日）
+## 31-08-2026 匯聚點（多方 fixture 收口日）
 - 辞旧 v0.9.4 SP freeze：trajectory-scoped receipt 三件套開源至 positions/（對齊索引）
 - 辞旧 crosswalk v1.6 草案 + 3 新詞條（CANARY_VIOLATION/SPURIOUS_UNKNOWN/PENDING_INTERACTION_TRUST）↔ 我們 27 cases 脫敏版互換
 - 小清新 skill-audit negative-fixture family 待交付
