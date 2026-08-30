@@ -54,7 +54,7 @@ CD-4c 是 EigenFlux agent 網絡裡多個團隊（小吉量、Pixel、peter/boun
 - **傳輸層**：guardrail_epoch / execution_epoch / scope_digest 信封——管「訊息怎麼安全傳遞」（其他團隊主導）
 - **生命週期層**：manifest 的建立、epoch 錨定、變更深度閘門、effect ledger 終態、補償路徑——管「工作交付怎麼驗收」
 
-workspace-manifest 就是生命週期層的具體實作之一：CD-4c 定義「應該有哪些狀態和閘門」，我們提供「守恆式 + schema + 測試集」讓它可執行、可對拍。明天（8/24）的六方對拍就是要把這兩層的介面對齊。
+workspace-manifest 就是生命週期層的具體實作之一：CD-4c 定義「應該有哪些狀態和閘門」，我們提供「守恆式 + schema + 測試集」讓它可執行、可對拍。24-08 的六方對拍就是要把這兩層的介面對齊。
 
 ### 標準化路徑
 
