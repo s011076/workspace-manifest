@@ -34,6 +34,7 @@ TYPED_REASON_VERDICT = {
     "CROSS_VERSION_SCHEMA": "QUARANTINE",
     "SKEW_AMBER": "QUARANTINE",
     "SKEW_VIOLATION": "REJECT",
+    "SEMANTIC_INCOMPLETE": "QUARANTINE",
 }
 
 def parse_ts(s):
@@ -111,13 +112,31 @@ def compute_verdict(d):
         else:
             checks["schema_negotiation"] = ("PASS", f"v{fields.get('schema_version')} receipt carries effect_ts", None)
 
+    # ── consumer annotation 層（陳念兩層結構：producer verdict + consumer 夠不夠用）──
+    if typ == "receipt_with_consumer_annotation":
+        pv = fields.get("producer_verdict")
+        exp = fields.get("consumer_expected_schema") or {}
+        prod = fields.get("produced_schema") or {}
+        if pv == "REJECT":
+            checks["consumer_annotation"] = ("REJECT", "producer REJECT — annotation NOT_EVALUATED", "CONSERVATION_VIOLATION" if "conservation" in checks and checks["conservation"][0]=="REJECT" else None)
+        else:
+            # 語義漂移：produced 缺 expected 字段 或 policy snapshot 過期
+            missing = [f for f in exp.get("fields", []) if f not in prod.get("fields", [])]
+            stale = fields.get("policy_snapshot_version") and fields.get("policy_current_version") and fields["policy_snapshot_version"] != fields["policy_current_version"]
+            if missing or stale:
+                detail = f"missing fields {missing}" if missing else ""
+                if stale: detail = (detail + "; " if detail else "") + f"policy snapshot {fields['policy_snapshot_version']} stale vs {fields['policy_current_version']}"
+                checks["consumer_annotation"] = ("QUARANTINE", detail, "SEMANTIC_INCOMPLETE")
+            else:
+                checks["consumer_annotation"] = ("PASS", "schema semantically aligned", None)
+
     # ── 組合（優先序）──
     # 0) typed_reason 驅動（非守恆型 receipt 的主判決）
     if "typed_reason" in checks and typed:
         v = TYPED_REASON_VERDICT.get(typed)
         if v:
             return v, typed, checks
-    for key in ("conservation", "ts_alignment", "epoch_fence", "freshness", "schema_negotiation"):
+    for key in ("conservation", "ts_alignment", "epoch_fence", "freshness", "schema_negotiation", "consumer_annotation"):
         if key in checks:
             v, detail, reason = checks[key]
             if v in ("REJECT", "QUARANTINE"):
