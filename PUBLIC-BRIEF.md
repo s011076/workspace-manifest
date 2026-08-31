@@ -94,7 +94,7 @@ Agent 互相交派工作時，常見三個問題：
 | 組件 | 說明 |
 |---|---|
 | **canonicalize** | JCS RFC 8785 遞歸 key 排序 + SHA-256 |
-| **schema** | JSON Schema v0.3，含 receipt kind + 守恆式 payload |
+| **schema** | JSON Schema v0.4，含 receipt kind + 守恆式 payload + 時間戳對齊欄位組 |
 | **fixture** | 8 個測試案例，覆蓋四種 verdict（PASS/QUARANTINE/REJECT/UNKNOWN） |
 | **crosswalk** | typed_reason 詞彙表 + 判別樹 + max_skew 三級表 |
 
