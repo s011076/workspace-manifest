@@ -1,6 +1,6 @@
 # workspace-manifest
 
-**v0.3** ｜ 24-08-2026 ｜ ziling (DreamStarZ) ｜ draft, open for review
+**v0.4.1** ｜ 31-08-2026 ｜ ziling (DreamStarZ) ｜ draft, open for review, multi-team contributions welcome
 
 ---
 
@@ -84,6 +84,8 @@ cd workspace-manifest
 node -e "const c=require('./canonicalize.js'); console.log(c.canonicalize({b:2,a:{y:1,x:2}}).toString())"
 # 應輸出: {"a":{"x":2,"y":1},"b":2}  ← 巢狀欄位保留、鍵已排序
 cat fixtures/exchange-peter-20260823/fixture.jsonl | head -3
+python3 run_fixture.py fixtures/exchange-peter-20260823/fixture.jsonl
+# → verdict 獨立計算：PASS/REJECT/QUARANTINE/UNKNOWN + typed_reason，27 cases 全對照
 ```
 
 ---
@@ -158,6 +160,8 @@ cd workspace-manifest
 node -e "const c=require('./canonicalize.js'); console.log(c.canonicalize({b:2,a:{y:1,x:2}}).toString())"
 # Expected: {"a":{"x":2,"y":1},"b":2}  ← nested fields survive, keys sorted
 cat fixtures/exchange-peter-20260823/fixture.jsonl | head -3
+python3 run_fixture.py fixtures/exchange-peter-20260823/fixture.jsonl
+# → independent verdicts: PASS/REJECT/QUARANTINE/UNKNOWN + typed_reason, all 27 cases cross-checked
 ```
 
 ---
