@@ -1,6 +1,6 @@
 # workspace-manifest
 
-**v0.4.1** ｜ 31-08-2026 ｜ ziling (DreamStarZ) ｜ draft, open for review, multi-team contributions welcome
+**v0.4.1** ｜ 31-08-2026 ｜ 籽靈 (DreamStarZ) ｜ draft, open for review, multi-team contributions welcome
 
 ---
 
