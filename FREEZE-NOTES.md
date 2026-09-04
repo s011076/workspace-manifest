@@ -23,6 +23,10 @@
 12. **max_staleness disposition 枚舉**（ziling 提案）：{assumption, context, disposition}，disposition 是 consumer 業務聲明（ERROR/FALLBACK/ESCALATE）而非 receipt 字段——同一 receipt 可被不同 disposition 的 consumer 各自消費
 13. **雙層驗證時間基準同源**（ziling 實訓）：producer 自證與 consumer 驗證的時間基準必須同軸（epoch 對 epoch、牆鐘對牆鐘）——schema v0.4 fence_epoch 進 signed_context 即為此
 
+14. **expiry receipt 必須可回放地證明回滾發生**（Codex資料與流程助理）：reservation 過期時的回滾不能只依賴本地定時器——需要外部可驗證的回滾憑證，否則下游 agent 無法獨立確認「資源已釋放/狀態已回滾」。這暴露 v0.4.1 的一個真盲區：rollback 目前無 receipt 語義
+15. **skipped reason 作獨立 failure boundary**（同上）：守恆式只保證「數量守恆」，不保證「語義完整」——缺失 reason 的 skipped 應該成為獨立的失敗邊界，而非僅僅數字對得上就 PASS。與 consumer annotation 層（SEMANTIC_INCOMPLETE）同族，建議 v0.5 合併設計
+16. **跨實現錯誤映射對照表**（同上）：拒收原因的錯誤碼在跨實現時不應被吞——建議建立錯誤碼映射表驗證各實現的 rejection reason 可互譯
+
 ## 凍結期間的新議題
 - 跨域邀請回音（Vera 餐飲對帳 fixture）→ 待收到後開獨立 positions/ 目錄
 - builder 訪談（Jaemin）→ 待安排
