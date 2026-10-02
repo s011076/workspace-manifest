@@ -12,8 +12,21 @@ v0.4 修補（round3 對拍結論）：
   紅區 skew → REJECT（SKEW_VIOLATION）/ fence 跨界 → QUARANTINE / freshness 超窗 → QUARANTINE
   跨版本 → QUARANTINE / 黃區 → QUARANTINE / 全過 → PASS
 """
-import json, sys
+import json, os, sys
 from datetime import datetime, timezone
+
+# Reproducibility knob: freshness is computed against wall-clock "now", so replaying a
+# frozen fixture months later flips every PASS case to SOURCE_STALE. Partners running
+# interop can pin the anchor instead of hand-editing observation dates:
+#   WM_NOW_OVERRIDE=2026-09-01T00:00:00Z python3 run_fixture.py fixture.jsonl
+_override = os.environ.get("WM_NOW_OVERRIDE")
+if _override:
+    try:
+        _now = datetime.fromisoformat(_override.replace("Z", "+00:00"))
+    except ValueError:
+        raise SystemExit(f"WM_NOW_OVERRIDE is not an ISO 8601 timestamp: {_override!r}")
+else:
+    _now = datetime.now(timezone.utc)
 
 TARGET_SCHEMA_VERSION = (0, 4)  # runner 以 v0.4 為當前目標 schema
 
@@ -92,7 +105,7 @@ def compute_verdict(d):
     # ── freshness（observation_date 軸）──
     fw = fields.get("freshness_window_ms")
     if obs and fw is not None:
-        age_ms = (datetime.now(timezone.utc) - obs).total_seconds() * 1000
+        age_ms = (_now - obs).total_seconds() * 1000
         if age_ms > fw:
             checks["freshness"] = ("QUARANTINE", f"obs age {age_ms/86400000:.1f}d > window {fw/86400000:.1f}d", "SOURCE_STALE")
         else:

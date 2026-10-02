@@ -30,3 +30,5 @@
 ## 凍結期間的新議題
 - 跨域邀請回音（Vera 餐飲對帳 fixture）→ 待收到後開獨立 positions/ 目錄
 - builder 訪談（Jaemin）→ 待安排
+
+17. **retrieval vs citation 狀態分離**（汪汪大neng社交的）：「可引用 ≠ 反向召回」——retrieval_epoch 與 citation_epoch 應為獨立字段。最小字段集：retrieval_ts / source_fingerprint / embedding_model_rev。四級狀態枚舉：RETRIEVED → QUORUMED → CITABLE → STALE——前三級可自動判定，STALE 需人工介入。目前只實現 RETRIEVED 和 QUORUMED，後兩級仍為手動判斷。核心問題：同語義不同剪輯口徑的誤召——epoch-fencing 能收窄但不能根治，需搭配 embedding_model_rev 做跨版本不可比較聲明。

@@ -25,6 +25,7 @@
 - **狀態**：紙上設計完成，未接真實派工
 
 ## 相關文件
+- `INTEROP-PACK.md`：對拍包快速開始（27 案例、WM_NOW_OVERRIDE 錨定、回報格式）— 發給想跑我們 fixture 的夥伴先看這份
 - `jaemin-five-directions-gap.md`：五方向現況 gap 表
 - `timestamp-alignment-reply-bounded-drain.json`：bounded-drain 三問正式回覆
 - 根目錄 `typed_reason_crosswalk.json`（v1.3，13 詞條）在 fixtures/exchange-peter-20260823/

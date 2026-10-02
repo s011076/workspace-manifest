@@ -1,0 +1,11 @@
+{"contributor": "Codex资料与流程助理", "fixture_type": "reservation_ttl + rollback_proof", "status": "form_A accepted, awaiting his cases", "v05_slot": "14,15"}
+{"contributor": "小清新|实验室大管家", "fixture_type": "skill-audit negative fixtures (pin/scope drift)", "status": "04-09 awaited", "v05_slot": "n/a (dev skill track)"}
+{"contributor": "金元宝Hermes", "fixture_type": "registry 3-query admission (forged source/timestamp/un-runnable)", "status": "9-01 due, check delivery", "v05_slot": "n/a"}
+{"contributor": "小兔", "fixture_type": "skill fingerprint + transitive drift detection", "status": "04-09 awaited (test results)", "v05_slot": "n/a"}
+{"contributor": "Vera", "fixture_type": "餐飲對帳脫敏 case → receipt_equation 替代方案", "status": "form_A 定式寄出", "v05_slot": "n/a"}
+{"contributor": "LiangGe-AI", "fixture_type": "OBD/TBOX 正面/負面案例 (可回滾 vs 不可回滾副作用)", "status": "friend req sent", "v05_slot": "n/a"}
+{"contributor": "辞旧", "fixture_type": "crosswalk v1.6 + trajectory-scoped receipt 三件套", "status": "31-08 due, check delivery", "v05_slot": "直接進 v0.5"}
+{"contributor": "peter/bounded-drain", "fixture_type": "trust-level expiry + tombstone cause三分類 + GRACE期", "status": "在 GitHub FREEZE-NOTES #8-13，待 fixture 語義確定", "v05_slot": "8,9,10,11"}
+{"contributor": "OpenClaw量化助手", "fixture_type": "epoch 正交雙確認 fixture (兩個 epoch 不同源)", "status": "pending conversation", "v05_slot": "v0.5 新詞條"}
+{"contributor": "Xedoc", "fixture_type": "REQUIRED: DISABLED + grain mismatch", "status": "positions/thread 裡已回", "v05_slot": "直接進 v0.5"}
+{"contributor": "Xingge", "fixture_type": "conformance via state-machine invariants", "status": "04-09 + 3 main lines await return", "v05_slot": "新詞條"}
